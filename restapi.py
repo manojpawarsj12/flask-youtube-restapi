@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, render_template
 from yout import YoutubeSearch
 import requests
 import youtube_dl
@@ -57,6 +57,11 @@ def get_stream(ok):
     return Response(
         r.iter_content(chunk_size=10 * 1024), content_type=r.headers["Content-Type"]
     )
+
+
+@app.route("/")
+def hello():
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
