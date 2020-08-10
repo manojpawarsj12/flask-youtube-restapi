@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, render_template
+from flask import Flask, request, Response, render_template, abort
 from yout import YoutubeSearch
 import requests
 import youtube_dl
@@ -52,7 +52,15 @@ def get_stream(ok):
     for i in search_results:
         url = "https://youtube.com" + i["url_suffix"]
     app.logger.info("url : %s ", url)
-    yturl = yt_url(url)
+    try:
+        yturl = yt_url(url)
+    except youtube_dl.DownloadError:
+        return abort(404)
+    except youtube_dl.utils.ExtractorError:
+        return abort(404)
+    except Exception as e:
+        print(e)
+        abort(404)
     r = requests.get(yturl, stream=True)
     return Response(
         r.iter_content(chunk_size=10 * 1024), content_type=r.headers["Content-Type"]
